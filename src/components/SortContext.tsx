@@ -6,10 +6,7 @@ export interface SortContextType {
   setCurrentSortType: (sortType: SortType) => void;
 }
 
-export const SortContext = createContext<SortContextType>({
-  currentSortType: SortType.Popular,
-  setCurrentSortType: (sortType: SortType) => sortType,
-});
+export const SortContext = createContext<SortContextType | null>(null);
 
 export function SortProvider({ children }: { children: ReactNode }) {
   const [currentSortType, setCurrentSortType] = useState<SortType>(SortType.Popular);
@@ -24,4 +21,3 @@ export function SortProvider({ children }: { children: ReactNode }) {
     </SortContext.Provider>
   );
 }
-
