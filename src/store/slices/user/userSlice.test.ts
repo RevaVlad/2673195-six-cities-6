@@ -1,7 +1,8 @@
-import { userData } from './userSlice';
-import { AuthorizationStatus } from '../../../const';
-import { checkAuthAction, loginAction, logoutAction } from '../../apiActions/userActions';
-import { UserDto } from '../../../types/responses/userDto';
+import {clearUserData, setUserData, userData} from './userSlice';
+import {AuthorizationStatus, NameSpace} from '../../../const';
+import {checkAuthAction, loginAction, logoutAction} from '../../apiActions/userActions';
+import {UserDto} from '../../../types/responses/userDto';
+import {getAuthCheckedStatus, getAuthorizationStatus, getUser} from './userSelectors';
 
 describe('User Slice', () => {
   const mockUser: UserDto = {
@@ -20,6 +21,7 @@ describe('User Slice', () => {
     authorizationStatus: AuthorizationStatus.Auth,
     user: mockUser,
   };
+
   describe('initial state', () => {
     it('should return initial state', () => {
       const result = userData.reducer(undefined, { type: '' });
@@ -30,7 +32,7 @@ describe('User Slice', () => {
   describe('reducers', () => {
     it('should handle setUserData', () => {
       const action = {
-        type: userData.actions.setUserData,
+        type: setUserData,
         payload: mockUser
       };
       const result = userData.reducer(initialState, action);
@@ -40,8 +42,7 @@ describe('User Slice', () => {
     });
 
     it('should handle clearUserData', () => {
-      const action = { type: userData.actions.clearUserData };
-      const result = userData.reducer(authorizedState, action);
+      const result = userData.reducer(authorizedState, clearUserData);
 
       expect(result.user).toBeNull();
       expect(result.authorizationStatus).toBe(AuthorizationStatus.NotAuth);
@@ -98,6 +99,95 @@ describe('User Slice', () => {
 
         expect(result.authorizationStatus).toBe(AuthorizationStatus.NotAuth);
         expect(result.user).toBeNull();
+      });
+    });
+  });
+
+  describe('selectors', () => {
+    describe('getAuthorizationStatus', () => {
+      it('returns AuthorizationStatus.Unknown for initial state', () => {
+        const state = {
+          [NameSpace.User]: initialState
+        };
+        const result = getAuthorizationStatus(state);
+        expect(result).toBe(AuthorizationStatus.Unknown);
+      });
+
+      it('returns AuthorizationStatus.Auth when user is authenticated', () => {
+        const state = {
+          [NameSpace.User]: authorizedState
+        };
+        const result = getAuthorizationStatus(state);
+        expect(result).toBe(AuthorizationStatus.Auth);
+      });
+
+      it('returns AuthorizationStatus.NotAuth when user is not authenticated', () => {
+        const notAuthState = {
+          [NameSpace.User]: {
+            authorizationStatus: AuthorizationStatus.NotAuth,
+            user: null
+          }
+        };
+        const result = getAuthorizationStatus(notAuthState);
+        expect(result).toBe(AuthorizationStatus.NotAuth);
+      });
+    });
+
+    describe('getAuthCheckedStatus', () => {
+      it('returns false when authorization status is Unknown', () => {
+        const state = {
+          [NameSpace.User]: initialState
+        };
+        const result = getAuthCheckedStatus(state);
+        expect(result).toBe(false);
+      });
+
+      it('returns true when authorization status is Auth', () => {
+        const state = {
+          [NameSpace.User]: authorizedState
+        };
+        const result = getAuthCheckedStatus(state);
+        expect(result).toBe(true);
+      });
+
+      it('returns true when authorization status is NotAuth', () => {
+        const notAuthState = {
+          [NameSpace.User]: {
+            authorizationStatus: AuthorizationStatus.NotAuth,
+            user: null
+          }
+        };
+        const result = getAuthCheckedStatus(notAuthState);
+        expect(result).toBe(true);
+      });
+    });
+
+    describe('getUser', () => {
+      it('returns null when no user is logged in', () => {
+        const state = {
+          [NameSpace.User]: initialState
+        };
+        const result = getUser(state);
+        expect(result).toBeNull();
+      });
+
+      it('returns user data when user is authenticated', () => {
+        const state = {
+          [NameSpace.User]: authorizedState
+        };
+        const result = getUser(state);
+        expect(result).toEqual(mockUser);
+      });
+
+      it('returns null after logout', () => {
+        const loggedOutState = {
+          [NameSpace.User]: {
+            authorizationStatus: AuthorizationStatus.NotAuth,
+            user: null
+          }
+        };
+        const result = getUser(loggedOutState);
+        expect(result).toBeNull();
       });
     });
   });

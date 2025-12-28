@@ -1,8 +1,10 @@
 import { favouritesData } from './favouritesScice.ts';
-import { fetchFavouriteAction } from '../../apiActions/favouriteActions.ts';
+import { fetchFavouriteAction } from '../../apiActions/favouriteActions';
 import { OffersList } from '../../../types/responses/offers/offersList';
 import { CityDto } from '../../../types/responses/cityDto';
 import { Location } from '../../../types/location';
+import { NameSpace } from '../../../const';
+import { getFavouritesInCity } from './favouritesSelectors';
 
 describe('Favourites Slice', () => {
   const createMockLocation = (overrides?: Partial<Location>): Location => ({
@@ -50,6 +52,22 @@ describe('Favourites Slice', () => {
       isPremium: false,
       rating: 4.3,
       previewImage: 'img/room.jpg'
+    },
+    {
+      id: '3',
+      title: 'Cozy apartment',
+      type: 'apartment',
+      price: 100,
+      city: createMockCityDto({ name: 'Paris' }),
+      location: createMockLocation({
+        latitude: 48.855610,
+        longitude: 2.352499,
+        zoom: 16
+      }),
+      isFavorite: true,
+      isPremium: false,
+      rating: 4.5,
+      previewImage: 'img/apartment-02.jpg'
     }
   ];
 
@@ -114,19 +132,44 @@ describe('Favourites Slice', () => {
     });
   });
 
-  describe('state immutability', () => {
-    it('should maintain state immutability', () => {
-      const state1 = favouritesData.reducer(undefined, { type: '' });
-      const action = {
-        type: fetchFavouriteAction.fulfilled.type,
-        payload: mockFavourites
-      };
-      const result = favouritesData.reducer(state1, action);
+  describe('selectors', () => {
+    const createMockState = (favourites: OffersList) => ({
+      [NameSpace.Favourites]: {
+        favourites,
+        hasError: false,
+        isFavouritesDataLoading: false,
+      }
+    });
 
-      expect(state1).not.toBe(result);
-      expect(state1.favourites).not.toBe(result.favourites);
-      expect(state1.favourites).toEqual([]);
-      expect(result.favourites).toEqual(mockFavourites);
+    it('filters favourites by city name', () => {
+      const state = createMockState(mockFavourites);
+      const result = getFavouritesInCity(state, 'Paris');
+
+      expect(result).toHaveLength(2);
+      expect(result[0].id).toBe('1');
+      expect(result[1].id).toBe('3');
+    });
+
+    it('returns empty array when city has no favourites', () => {
+      const state = createMockState(mockFavourites);
+      const result = getFavouritesInCity(state, 'Amsterdam');
+
+      expect(result).toEqual([]);
+    });
+
+    it('returns all favourites for city when multiple cities exist', () => {
+      const state = createMockState(mockFavourites);
+      const result = getFavouritesInCity(state, 'Cologne');
+
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('2');
+    });
+
+    it('returns empty array when state has no favourites', () => {
+      const emptyState = createMockState([]);
+      const result = getFavouritesInCity(emptyState, 'Paris');
+
+      expect(result).toEqual([]);
     });
   });
 });

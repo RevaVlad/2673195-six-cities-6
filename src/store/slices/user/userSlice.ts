@@ -44,3 +44,5 @@ export const userData = createSlice({
       });
   }
 });
+
+export const { setUserData, clearUserData } = userData.actions;

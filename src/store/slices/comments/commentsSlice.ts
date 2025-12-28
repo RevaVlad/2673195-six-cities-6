@@ -10,7 +10,7 @@ const initialState: CommentsState = {
   hasError: false,
 };
 
-export const commentsData = createSlice({
+export const commentsSlice = createSlice({
   name: NameSpace.Comments,
   initialState,
   reducers: {},
