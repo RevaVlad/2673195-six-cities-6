@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { Header } from './Header.tsx';
 import {CITIES} from '../../const.ts';
-import {SortProvider} from '../../components/SortContext.tsx';
+import {SortProvider} from '../../hocs/SortContext.tsx';
 
 describe('Header Component', () => {
   const defaultProps = {

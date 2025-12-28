@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { useSort } from './useSort';
-import { SortProvider } from '../components/SortContext';
+import { SortProvider } from '../hocs/SortContext';
 import { SortType } from '../const';
 import React from 'react';
 import {act} from 'react-dom/test-utils';

@@ -1,5 +1,5 @@
 import {useContext} from 'react';
-import {SortContext, SortContextType} from '../components/SortContext.tsx';
+import {SortContext, SortContextType} from '../hocs/SortContext.tsx';
 
 export function useSort(): SortContextType {
   const context = useContext(SortContext);

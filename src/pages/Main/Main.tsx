@@ -11,7 +11,7 @@ import {getCityName} from '../../store/slices/city/citySelectors.ts';
 import {Navigate} from 'react-router-dom';
 import {Spinner} from '../../components/Spinner.tsx';
 import CitiesPlaces from './CitiesPlaces.tsx';
-import {SortProvider} from '../../components/SortContext.tsx';
+import {SortProvider} from '../../hocs/SortContext.tsx';
 import {MainEmpty} from './MainEmpty.tsx';
 
 export function Main() {
