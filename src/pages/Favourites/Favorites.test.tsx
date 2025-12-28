@@ -4,6 +4,7 @@ import { vi } from 'vitest';
 import type { Mock } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { AppRoute, CITIES_LIST } from '../../const.ts';
+import {ReactNode} from 'react';
 
 const mockUseAppDispatch = vi.hoisted<Mock>(() => vi.fn());
 const mockUseAppSelector = vi.hoisted<Mock>(() => vi.fn());
@@ -26,7 +27,7 @@ const MockNavigate = vi.hoisted(() =>
 );
 
 const MockLink = vi.hoisted(() =>
-  vi.fn(({ children, to }) => <a href={to} data-testid="link">{children}</a>)
+  vi.fn(({ children, to } : { children: ReactNode; to: string}) => <a href={to} data-testid="link">{children}</a>)
 );
 
 vi.mock('../../components/navigation/Navigation.tsx', () => ({
@@ -86,17 +87,15 @@ describe('Component: Favourites', () => {
     },
   ];
 
-  const renderWithRouter = (component: React.ReactNode) => {
-    return render(
-      <MemoryRouter initialEntries={['/favorites']}>
-        <Routes>
-          <Route path="/favorites" element={component} />
-          <Route path={AppRoute.NotFound} element={<div data-testid="not-found">Not Found</div>} />
-          <Route path={AppRoute.Main} element={<div data-testid="main">Main</div>} />
-        </Routes>
-      </MemoryRouter>
-    );
-  };
+  const renderWithRouter = (component: ReactNode) => render(
+    <MemoryRouter initialEntries={['/favorites']}>
+      <Routes>
+        <Route path="/favorites" element={component} />
+        <Route path={AppRoute.NotFound} element={<div data-testid="not-found">Not Found</div>} />
+        <Route path={AppRoute.Main} element={<div data-testid="main">Main</div>} />
+      </Routes>
+    </MemoryRouter>
+  );
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -156,7 +155,7 @@ describe('Component: Favourites', () => {
 
     expect(MockCityFavourites).toHaveBeenCalledTimes(CITIES_LIST.length);
 
-    CITIES_LIST.forEach(city => {
+    CITIES_LIST.forEach((city) => {
       expect(MockCityFavourites).toHaveBeenCalledWith({ cityName: city }, {});
     });
   });

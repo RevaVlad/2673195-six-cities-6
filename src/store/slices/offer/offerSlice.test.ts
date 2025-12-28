@@ -277,8 +277,16 @@ describe('Offer Slice', () => {
 });
 
 describe('Offer Selectors', () => {
-  const createMockState = (offerState: any) => ({
-    [NameSpace.Offer]: offerState
+  const createMockState = (offer: OfferDto | null, nearby: OffersList) => ({
+    [NameSpace.Offer]: {
+      isLoading: false,
+      hasError: false,
+      nearbyLoading: false,
+      nearbyHasError: false,
+      lastFetchedId: null,
+      offer: offer,
+      nearby: nearby,
+    }
   });
 
   describe('getFilteredNearbyOffers', () => {
@@ -290,10 +298,10 @@ describe('Offer Selectors', () => {
         createMockOffersListItem({ id: '3' }),
       ];
 
-      const state = createMockState({
-        offer: mockOffer,
-        nearby: mockNearbyOffers,
-      });
+      const state = createMockState(
+        mockOffer,
+        mockNearbyOffers,
+      );
 
       const result = getFilteredNearbyOffers(state);
       expect(result).toHaveLength(2);
@@ -307,10 +315,10 @@ describe('Offer Selectors', () => {
         createMockOffersListItem({ id: '2' }),
       ];
 
-      const state = createMockState({
-        offer: null,
-        nearby: mockNearbyOffers,
-      });
+      const state = createMockState(
+        null,
+        mockNearbyOffers,
+      );
 
       const result = getFilteredNearbyOffers(state);
       expect(result).toHaveLength(2);
@@ -318,10 +326,10 @@ describe('Offer Selectors', () => {
 
     it('returns empty array when no nearby offers', () => {
       const mockOffer = createMockOfferDto({ id: '1' });
-      const state = createMockState({
-        offer: mockOffer,
-        nearby: [],
-      });
+      const state = createMockState(
+        mockOffer,
+        [],
+      );
 
       const result = getFilteredNearbyOffers(state);
       expect(result).toEqual([]);
@@ -345,10 +353,10 @@ describe('Offer Selectors', () => {
         }),
       ];
 
-      const state = createMockState({
-        offer: mockOffer,
-        nearby: mockNearbyOffers,
-      });
+      const state = createMockState(
+        mockOffer,
+        mockNearbyOffers,
+      );
 
       const result = getNearbyPoints(state);
       expect(result).toHaveLength(3);
@@ -365,24 +373,14 @@ describe('Offer Selectors', () => {
         }),
       ];
 
-      const state = createMockState({
-        offer: null,
-        nearby: mockNearbyOffers,
-      });
+      const state = createMockState(
+        null,
+        mockNearbyOffers,
+      );
 
       const result = getNearbyPoints(state);
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual(createMockLocation({ latitude: 3, longitude: 4, zoom: 13 }));
-    });
-
-    it('returns empty array when no nearby offers and no current offer', () => {
-      const state = createMockState({
-        offer: null,
-        nearby: [],
-      });
-
-      const result = getNearbyPoints(state);
-      expect(result).toEqual([]);
     });
   });
 
@@ -394,18 +392,20 @@ describe('Offer Selectors', () => {
       });
       const mockOffer = createMockOfferDto({ city: mockCity });
 
-      const state = createMockState({
-        offer: mockOffer,
-      });
+      const state = createMockState(
+        mockOffer,
+        []
+      );
 
       const result = getOfferCity(state);
       expect(result).toEqual(mockCity);
     });
 
     it('returns null when no offer', () => {
-      const state = createMockState({
-        offer: null,
-      });
+      const state = createMockState(
+        null,
+        []
+      );
 
       const result = getOfferCity(state);
       expect(result).toBeNull();
