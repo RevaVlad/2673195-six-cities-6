@@ -8,8 +8,17 @@ const getComments = (state: Pick<State, NameSpace.Comments>) =>
 
 export const getCommentsFiltered = createSelector(
   [getComments],
-  (reviews) =>
-    reviews.length > 0 ? reviews.toSorted((a: ReviewData, b: ReviewData) => new Date(b.date) > new Date(a.date) ? 1 : -1).slice(0, 10) : []
+  (reviews) => {
+    if (reviews.length === 0) {
+      return [];
+    }
+
+    const sortedReviews = [...reviews].sort((a: ReviewData, b: ReviewData) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+
+    return sortedReviews.slice(0, 10);
+  }
 );
 
 export const getTotalComments = (state: Pick<State, NameSpace.Comments>) =>
