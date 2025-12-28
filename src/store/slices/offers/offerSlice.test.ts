@@ -5,8 +5,9 @@ import { NameSpace } from '../../../const';
 import { OffersListItem } from '../../../types/responses/offers/offersList';
 import { CityDto } from '../../../types/responses/cityDto';
 import { Location } from '../../../types/location';
-import {State} from '../../../types/state.ts';
-import {CityName} from '../../../types/cityName.ts';
+import { State } from '../../../types/state.ts';
+import { CityName } from '../../../types/cityName.ts';
+import { OffersState } from '../../../types/stateSlices/offersState.ts';
 
 describe('Offers Slice', () => {
   const createMockLocation = (overrides?: Partial<Location>): Location => ({
@@ -95,7 +96,7 @@ describe('Offers Slice', () => {
   });
 
   describe('selectors', () => {
-    const createMockState = (offersState: any, cityName: CityName) : Pick<State, NameSpace.Offers | NameSpace.City> => ({
+    const createMockState = (offersState: OffersState, cityName: CityName) : Pick<State, NameSpace.Offers | NameSpace.City> => ({
       [NameSpace.Offers]: offersState,
       [NameSpace.City]: {
         cityName: cityName,
