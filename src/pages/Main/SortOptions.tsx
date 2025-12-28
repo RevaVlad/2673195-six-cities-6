@@ -22,6 +22,7 @@ function SortOptions() {
         className="places__sorting-type"
         tabIndex={0}
         onClick={handleToggleClick}
+        data-testid="sort-toggle" // Добавлено
       >
         {currentSortType}
         <svg className="places__sorting-arrow" width="7" height="4">
