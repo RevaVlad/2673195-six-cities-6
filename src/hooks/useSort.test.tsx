@@ -34,8 +34,12 @@ describe('Hook: useSort', () => {
   });
 
   it('should throw Error when used outside SortProvider', () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
     expect(() => {
       renderHook(() => useSort());
     }).toThrow('useSort не может применяться к компоненту без SortProvider\'а.');
+
+    consoleSpy.mockRestore();
   });
 });
