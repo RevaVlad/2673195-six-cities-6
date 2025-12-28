@@ -2,16 +2,19 @@ import {Navigation} from '../../components/navigation/Navigation.tsx';
 import {CityFavourites} from './CityFavourites.tsx';
 import {useAppSelector} from '../../hooks/useAppSelector.ts';
 import {
+  getFavourites,
   getFavouritesErrorStatus,
   getFavouritesLoadingStatus
 } from '../../store/slices/favourites/favouritesSelectors.ts';
 import {AppRoute, CITIES_LIST} from '../../const.ts';
-import {Link} from 'react-router-dom';
+import {Link, Navigate} from 'react-router-dom';
 import {useEffect} from 'react';
 import {useAppDispatch} from '../../hooks/useAppDispatch.ts';
 import {fetchFavouriteAction} from '../../store/apiActions/favouriteActions.ts';
+import {FavoritesEmpty} from './FavoritesEmpty.tsx';
 
 export function Favourites() {
+  const favorites = useAppSelector(getFavourites);
   const isFavouritesLoading = useAppSelector(getFavouritesLoadingStatus);
   const hasError = useAppSelector(getFavouritesErrorStatus);
 
@@ -28,7 +31,7 @@ export function Favourites() {
   }
 
   if (hasError) {
-    return <>Ошибка</>;
+    return <Navigate to={AppRoute.NotFound}/>;
   }
 
   return (
@@ -38,12 +41,19 @@ export function Favourites() {
       <main className="page__main page__main--favorites">
         <div className="page__favorites-container container">
           <section className="favorites">
-            <h1 className="favorites__title">Saved listing</h1>
-            <ul className="favorites__list">
-              {CITIES_LIST.map((cityWithOffer) => (
-                <CityFavourites cityName={cityWithOffer} key={cityWithOffer}/>
-              ))}
-            </ul>
+            {
+              favorites.length > 0
+                ?
+                <>
+                  <h1 className="favorites__title">Saved listing</h1>
+                  <ul className="favorites__list">
+                    {CITIES_LIST.map((cityWithOffer) => (
+                      <CityFavourites cityName={cityWithOffer} key={cityWithOffer}/>
+                    ))}
+                  </ul>
+                </>
+                : <FavoritesEmpty/>
+            }
           </section>
         </div>
       </main>
