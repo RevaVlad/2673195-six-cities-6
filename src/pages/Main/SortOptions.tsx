@@ -1,6 +1,6 @@
 import { memo, useState, useCallback } from 'react';
 import {SORT_OPTIONS, SortType} from '../../const.ts';
-import { useSort } from '../../hooks/useSort.tsx';
+import { useSort } from '../../hooks/useSort.ts';
 
 function SortOptions() {
   const {currentSortType, setCurrentSortType} = useSort();
@@ -22,6 +22,7 @@ function SortOptions() {
         className="places__sorting-type"
         tabIndex={0}
         onClick={handleToggleClick}
+        data-testid="sort-toggle" // Добавлено
       >
         {currentSortType}
         <svg className="places__sorting-arrow" width="7" height="4">

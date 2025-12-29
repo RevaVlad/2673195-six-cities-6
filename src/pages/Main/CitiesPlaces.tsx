@@ -7,7 +7,7 @@ import {CityName} from '../../types/cityName.ts';
 import {useCallback, useMemo, useState} from 'react';
 import {Location} from '../../types/location.ts';
 import {sortOffers} from '../../utils/sortOffers.ts';
-import {useSort} from '../../hooks/useSort.tsx';
+import {useSort} from '../../hooks/useSort.ts';
 
 interface CitiesContentProps {
   city: CityName;

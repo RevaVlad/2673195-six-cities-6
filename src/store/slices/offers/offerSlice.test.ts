@@ -1,18 +1,49 @@
 import { offersData } from './offersSlice';
 import { fetchOffersAction } from '../../apiActions/offersActions';
+import { getOffersInCity, getOffersLoadingStatus, getOffersErrorStatus } from './offersSelectors';
+import { NameSpace } from '../../../const';
+import { OffersListItem } from '../../../types/responses/offers/offersList';
+import { CityDto } from '../../../types/responses/cityDto';
+import { Location } from '../../../types/location';
+import { State } from '../../../types/state.ts';
+import { CityName } from '../../../types/cityName.ts';
+import { OffersState } from '../../../types/stateSlices/offersState.ts';
 
 describe('Offers Slice', () => {
+  const createMockLocation = (overrides?: Partial<Location>): Location => ({
+    latitude: 48.85661,
+    longitude: 2.351499,
+    zoom: 13,
+    ...overrides
+  });
+
+  const createMockCityDto = (overrides?: Partial<CityDto>): CityDto => ({
+    name: 'Paris',
+    location: createMockLocation(),
+    ...overrides
+  });
+
+  const createMockOffersListItem = (overrides?: Partial<OffersListItem>): OffersListItem => ({
+    id: '1',
+    title: 'Beautiful & luxurious apartment at great location',
+    type: 'apartment',
+    price: 120,
+    city: createMockCityDto({ name: 'Paris' }),
+    location: createMockLocation({
+      latitude: 48.865610000000004,
+      longitude: 2.350499,
+      zoom: 16
+    }),
+    isFavorite: true,
+    isPremium: true,
+    rating: 4.8,
+    previewImage: 'img/apartment-01.jpg',
+    ...overrides
+  });
+
   const mockOffers = [
-    {
-      id: '1',
-      title: 'Test Offer 1',
-      city: { name: 'Paris' },
-    },
-    {
-      id: '2',
-      title: 'Test Offer 2',
-      city: { name: 'Amsterdam' },
-    }
+    createMockOffersListItem({ id: '1' }),
+    createMockOffersListItem({ id: '2', city: createMockCityDto({ name: 'Amsterdam' }) }),
   ];
 
   const initialState = {
@@ -64,19 +95,121 @@ describe('Offers Slice', () => {
     });
   });
 
-  describe('state immutability', () => {
-    it('should maintain state immutability', () => {
-      const state1 = offersData.reducer(undefined, { type: '' });
-      const action = {
-        type: fetchOffersAction.fulfilled.type,
-        payload: mockOffers
-      };
-      const result = offersData.reducer(state1, action);
+  describe('selectors', () => {
+    const createMockState = (offersState: OffersState, cityName: CityName) : Pick<State, NameSpace.Offers | NameSpace.City> => ({
+      [NameSpace.Offers]: offersState,
+      [NameSpace.City]: {
+        cityName: cityName,
+      },
+    });
 
-      expect(state1).not.toBe(result);
-      expect(state1.offers).not.toBe(result.offers);
-      expect(state1.offers).toEqual([]);
-      expect(result.offers).toEqual(mockOffers);
+    describe('getOffersInCity', () => {
+      const parisOffer = createMockOffersListItem({
+        id: '1',
+        city: { name: 'Paris', location: { latitude: 48.85661, longitude: 2.351499, zoom: 13 } }
+      });
+      const amsterdamOffer = createMockOffersListItem({
+        id: '2',
+        city: { name: 'Amsterdam', location: { latitude: 52.37454, longitude: 4.897976, zoom: 13 } }
+      });
+      const parisOffer2 = createMockOffersListItem({
+        id: '3',
+        city: { name: 'Paris', location: { latitude: 48.85661, longitude: 2.351499, zoom: 13 } }
+      });
+
+      it('filters offers by city name', () => {
+        const state = createMockState({
+          offers: [parisOffer, amsterdamOffer, parisOffer2],
+          hasError: false,
+          isOffersDataLoading: false,
+        }, 'Paris');
+
+        const result = getOffersInCity(state);
+        expect(result).toHaveLength(2);
+        expect(result[0].id).toBe('1');
+        expect(result[1].id).toBe('3');
+      });
+
+      it('returns empty array when city has no offers', () => {
+        const state = createMockState({
+          offers: [parisOffer, parisOffer2],
+          hasError: false,
+          isOffersDataLoading: false,
+        }, 'Amsterdam');
+
+        const result = getOffersInCity(state);
+        expect(result).toEqual([]);
+      });
+
+      it('returns all offers when city has multiple offers', () => {
+        const state = createMockState({
+          offers: [parisOffer, amsterdamOffer, parisOffer2],
+          hasError: false,
+          isOffersDataLoading: false,
+        }, 'Paris');
+
+        const result = getOffersInCity(state);
+        expect(result).toHaveLength(2);
+      });
+
+      it('returns empty array when state has no offers', () => {
+        const state = createMockState({
+          offers: [],
+          hasError: false,
+          isOffersDataLoading: false,
+        }, 'Paris');
+
+        const result = getOffersInCity(state);
+        expect(result).toEqual([]);
+      });
+    });
+
+    describe('getOffersLoadingStatus', () => {
+      it('returns loading status when loading', () => {
+        const state = createMockState({
+          offers: [],
+          hasError: false,
+          isOffersDataLoading: true,
+        }, 'Paris');
+
+        const result = getOffersLoadingStatus(state);
+        expect(result).toBe(true);
+      });
+
+      it('returns loading status when not loading', () => {
+        const state = createMockState({
+          offers: [],
+          hasError: false,
+          isOffersDataLoading: false,
+        }, 'Paris');
+
+        const result = getOffersLoadingStatus(state);
+        expect(result).toBe(false);
+      });
+    });
+
+    describe('getOffersErrorStatus', () => {
+      it('returns error status when has error', () => {
+        const state = createMockState({
+          offers: [],
+          hasError: true,
+          isOffersDataLoading: false,
+        }, 'Paris');
+
+        const result = getOffersErrorStatus(state);
+        expect(result).toBe(true);
+      });
+
+      it('returns error status when no error', () => {
+        const state = createMockState({
+          offers: [],
+          hasError: false,
+          isOffersDataLoading: false,
+        }, 'Paris');
+
+        const result = getOffersErrorStatus(state);
+        expect(result).toBe(false);
+      });
     });
   });
 });

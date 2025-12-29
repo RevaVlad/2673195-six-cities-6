@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { Header } from './Header.tsx';
 import {CITIES} from '../../const.ts';
+import {SortProvider} from '../../hocs/SortContext.tsx';
 
 describe('Header Component', () => {
   const defaultProps = {
@@ -9,7 +10,7 @@ describe('Header Component', () => {
   };
 
   it('should render correctly with given props', () => {
-    render(<Header {...defaultProps} />);
+    render(<SortProvider><Header {...defaultProps} /></SortProvider>);
 
     expect(screen.getByText('5 places to stay in Paris')).toBeInTheDocument();
     expect(screen.getByText('Places')).toBeInTheDocument();
@@ -22,7 +23,7 @@ describe('Header Component', () => {
       offersInCityCount: 12,
     };
 
-    render(<Header {...props} />);
+    render(<SortProvider><Header {...props} /></SortProvider>);
 
     expect(screen.getByText('12 places to stay in Amsterdam')).toBeInTheDocument();
   });

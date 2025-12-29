@@ -1,11 +1,11 @@
+import {toast} from 'react-toastify';
 import {Link, Navigate} from 'react-router-dom';
-import {AppRoute, AuthorizationStatus} from '../../const.ts';
 import {FormEvent, useRef} from 'react';
+import {AppRoute, AuthorizationStatus} from '../../const.ts';
 import {useAppDispatch} from '../../hooks/useAppDispatch.ts';
 import {loginAction} from '../../store/apiActions/userActions.ts';
 import {useAppSelector} from '../../hooks/useAppSelector.ts';
 import {getAuthorizationStatus} from '../../store/slices/user/userSelectors.ts';
-import {toast} from 'react-toastify';
 
 export function Login() {
   const authStatus = useAppSelector(getAuthorizationStatus);
