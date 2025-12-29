@@ -3,13 +3,10 @@ import {AppDispatch, State} from '../../types/state.ts';
 import {AxiosInstance} from 'axios';
 import {APIRoute} from '../../const.ts';
 import {PostCommentRequest} from '../../types/requests/postCommentRequest.ts';
-import {mapCommentToReview} from '../../utils/mapCommentToReview.ts';
 import {CommentList} from '../../types/responses/comments/commentList.ts';
-import {ReviewListData} from '../../types/reviews/reviewListData.ts';
-import {ReviewData} from '../../types/reviews/reviewData.ts';
 import {CommentDto} from '../../types/responses/comments/commentsDto.ts';
 
-export const fetchCommentsAction = createAsyncThunk<ReviewListData, string, {
+export const fetchCommentsAction = createAsyncThunk<CommentList, string, {
   dispatch: AppDispatch;
   state: State;
   extra: AxiosInstance;
@@ -17,11 +14,11 @@ export const fetchCommentsAction = createAsyncThunk<ReviewListData, string, {
   'data/fetchComments',
   async (offerId, {extra: api}) => {
     const {data} = await api.get<CommentList>(APIRoute.Comments(offerId));
-    return data.map((comment) => mapCommentToReview(comment));
+    return data;
   },
 );
 
-export const postCommentAction = createAsyncThunk<ReviewData, PostCommentRequest, {
+export const postCommentAction = createAsyncThunk<CommentDto, PostCommentRequest, {
   dispatch: AppDispatch;
   state: State;
   extra: AxiosInstance;
@@ -29,6 +26,6 @@ export const postCommentAction = createAsyncThunk<ReviewData, PostCommentRequest
   'data/postComment',
   async ({ offerId, comment } : PostCommentRequest, {extra: api}) => {
     const {data} = await api.post<CommentDto>(APIRoute.Comments(offerId), comment);
-    return mapCommentToReview(data);
+    return data;
   },
 );

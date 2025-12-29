@@ -1,12 +1,13 @@
 import { commentsSlice } from './commentsSlice.ts';
 import { fetchCommentsAction, postCommentAction } from '../../apiActions/commentsActions';
-import { ReviewData } from '../../../types/reviews/reviewData';
-import { getCommentsFiltered } from './commentsSelectors';
+import { getReviewsFiltered } from './commentsSelectors';
 import {NameSpace} from '../../../const.ts';
+import {CommentDto} from '../../../types/responses/comments/commentsDto.ts';
+import {CommentList} from '../../../types/responses/comments/commentList.ts';
 
-const createMockReviewData = (overrides?: Partial<ReviewData>): ReviewData => ({
+const createMockCommentsData = (overrides?: Partial<CommentDto>): CommentDto => ({
   id: 1,
-  date: new Date('2024-01-15T10:30:00Z'),
+  date: '2024-01-15T10:30:00Z',
   user: {
     name: 'John Doe',
     avatarUrl: 'avatar.jpg',
@@ -20,9 +21,9 @@ const createMockReviewData = (overrides?: Partial<ReviewData>): ReviewData => ({
 describe('Comments Slice', () => {
 
   const mockComments = Array.from({ length: 11 }, (_, index) =>
-    createMockReviewData({
+    createMockCommentsData({
       id: index + 1,
-      date: new Date(`2024-01-${String(index + 10).padStart(2, '0')}T10:30:00Z`),
+      date: `2024-01-${String(index + 10).padStart(2, '0')}T10:30:00Z`,
       comment: `Comment ${index + 1}`
     })
   );
@@ -116,9 +117,9 @@ describe('Comments Slice', () => {
           hasError: false,
         };
 
-        const newComment = createMockReviewData({
+        const newComment = createMockCommentsData({
           id: 12,
-          date: new Date('2024-02-01T10:30:00Z'),
+          date: '2024-02-01T10:30:00Z',
           comment: 'New comment'
         });
 
@@ -150,7 +151,7 @@ describe('Comments Slice', () => {
   });
 
   describe('selectors', () => {
-    const createMockState = (comments: ReviewData[]) => ({
+    const createMockState = (comments: CommentList) => ({
       [NameSpace.Comments]: {
         comments,
         totalComments: comments.length,
@@ -161,19 +162,19 @@ describe('Comments Slice', () => {
 
     it('returns empty array for no comments', () => {
       const state = createMockState([]);
-      const result = getCommentsFiltered(state);
+      const result = getReviewsFiltered(state);
       expect(result).toEqual([]);
     });
 
     it('returns sorted comments by date descending', () => {
       const unsortedComments = [
-        createMockReviewData({ id: 1, date: new Date('2024-01-10T10:30:00Z') }),
-        createMockReviewData({ id: 2, date: new Date('2024-01-20T10:30:00Z') }),
-        createMockReviewData({ id: 3, date: new Date('2024-01-15T10:30:00Z') }),
+        createMockCommentsData({ id: 1, date: '2024-01-10T10:30:00Z' }),
+        createMockCommentsData({ id: 2, date: '2024-01-20T10:30:00Z' }),
+        createMockCommentsData({ id: 3, date: '2024-01-15T10:30:00Z' }),
       ];
 
       const state = createMockState(unsortedComments);
-      const result = getCommentsFiltered(state);
+      const result = getReviewsFiltered(state);
 
       expect(result).toHaveLength(3);
       expect(result[0].id).toBe(2);
@@ -183,14 +184,14 @@ describe('Comments Slice', () => {
 
     it('returns only first 10 comments when more than 10', () => {
       const allComments = Array.from({ length: 15 }, (_, index) =>
-        createMockReviewData({
+        createMockCommentsData({
           id: index + 1,
-          date: new Date(`2024-01-${String(index + 10).padStart(2, '0')}T10:30:00Z`)
+          date: `2024-01-${String(index + 10).padStart(2, '0')}T10:30:00Z`
         })
       );
 
       const state = createMockState(allComments);
-      const result = getCommentsFiltered(state);
+      const result = getReviewsFiltered(state);
 
       expect(result).toHaveLength(10);
       expect(result[0].id).toBe(15);
