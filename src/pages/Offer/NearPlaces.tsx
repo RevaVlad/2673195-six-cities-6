@@ -13,7 +13,6 @@ export function NearPlaces() {
           offers={offers.slice(0, 3)}
           cardStyle={OfferCardStyle.NearPlace}
           onActivePointChange={() => {}}
-
         />
       </section>
     </div>

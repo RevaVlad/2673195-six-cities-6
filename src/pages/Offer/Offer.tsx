@@ -107,9 +107,9 @@ export function Offer() {
               {authStatus === AuthorizationStatus.Auth && <ReviewsBlock offerId={offer.id}/>}
             </div>
           </div>
-          <NearPlacesMap/>
+          <NearPlacesMap currentOfferPoint={offer.location}/>
         </section>
-        <NearPlaces/>
+        <NearPlaces />
       </main>
     </div>
   );

@@ -7,8 +7,9 @@ import {
   getOfferCity
 } from '../../store/slices/offer/offerSelectors.ts';
 import {Spinner} from '../../components/Spinner.tsx';
+import {Location} from '../../types/location.ts';
 
-export function NearPlacesMap() {
+export function NearPlacesMap({currentOfferPoint}: { currentOfferPoint: Location }) {
   const loading = useAppSelector(getNearbyLoadingStatus);
   const error = useAppSelector(getNearbyErrorStatus);
   const city = useAppSelector(getOfferCity);
@@ -19,9 +20,9 @@ export function NearPlacesMap() {
       {loading || error || !city ? <Spinner /> :
         <Map
           city={city}
-          points={nearPlacesPoints}
+          points={nearPlacesPoints.slice(0, 3).concat([currentOfferPoint])}
           className={'offer__map map'}
-          selectedPoint={null}
+          selectedPoint={currentOfferPoint}
         />}
     </div>);
 }
