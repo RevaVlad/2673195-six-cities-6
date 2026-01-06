@@ -72,6 +72,7 @@ describe('Component: ReviewsBlock', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseAppDispatch.mockReturnValue(vi.fn());
     mockFetchCommentsAction.mockReturnValue({
       type: 'FETCH_COMMENTS',
       payload: mockOfferId
@@ -115,7 +116,7 @@ describe('Component: ReviewsBlock', () => {
     expect(screen.getByTestId('review-form')).toHaveTextContent(`Form for offer: ${mockOfferId}`);
   });
 
-  it('renders reviews list when there is an error and not loading', () => {
+  it('does NOT render reviews list when there is an error', () => {
     mockUseAppSelector.mockReturnValueOnce(false)
       .mockReturnValueOnce(true)
       .mockReturnValueOnce(mockComments)
@@ -123,12 +124,11 @@ describe('Component: ReviewsBlock', () => {
 
     render(<ReviewsBlock offerId={mockOfferId} />);
 
-    expect(screen.getByTestId('reviews-list')).toBeInTheDocument();
-    expect(screen.getByTestId('reviews-list')).toHaveTextContent('Reviews: 2');
+    expect(screen.queryByTestId('reviews-list')).not.toBeInTheDocument();
     expect(screen.getByTestId('review-form')).toBeInTheDocument();
   });
 
-  it('does not render reviews list when there is no error', () => {
+  it('renders reviews list when there is NO error', () => {
     mockUseAppSelector.mockReturnValueOnce(false)
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(mockSingleComment)
@@ -136,7 +136,7 @@ describe('Component: ReviewsBlock', () => {
 
     render(<ReviewsBlock offerId={mockOfferId} />);
 
-    expect(screen.queryByTestId('reviews-list')).not.toBeInTheDocument();
+    expect(screen.getByTestId('reviews-list')).toHaveTextContent('Reviews: 1');
     expect(screen.getByTestId('review-form')).toBeInTheDocument();
   });
 
@@ -145,6 +145,9 @@ describe('Component: ReviewsBlock', () => {
       .mockReturnValueOnce(false)
       .mockReturnValueOnce(mockEmptyComments)
       .mockReturnValueOnce(0);
+
+    const mockDispatch = vi.fn();
+    mockUseAppDispatch.mockReturnValue(mockDispatch);
 
     render(<ReviewsBlock offerId={mockOfferId} />);
 
@@ -155,12 +158,19 @@ describe('Component: ReviewsBlock', () => {
   });
 
   it('dispatches fetchCommentsAction when offerId changes', () => {
+    const mockDispatch = vi.fn();
+    mockUseAppDispatch.mockReturnValue(mockDispatch);
+
+    mockUseAppSelector.mockReturnValueOnce(false)
+      .mockReturnValueOnce(false)
+      .mockReturnValueOnce(mockEmptyComments)
+      .mockReturnValueOnce(0);
+
     const { rerender } = render(<ReviewsBlock offerId="123" />);
 
-    mockUseAppSelector.mockClear();
-    mockUseAppDispatch.mockClear();
-    mockFetchCommentsAction.mockClear();
+    vi.clearAllMocks();
 
+    mockUseAppDispatch.mockReturnValue(mockDispatch);
     mockFetchCommentsAction.mockReturnValue({
       type: 'FETCH_COMMENTS',
       payload: '456'

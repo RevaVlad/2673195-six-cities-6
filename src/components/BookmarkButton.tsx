@@ -1,7 +1,8 @@
 import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {useAppDispatch} from '../hooks/useAppDispatch.ts';
 import {changeOfferFavouriteStatus, fetchFavouriteAction} from '../store/apiActions/favouriteActions.ts';
-import {AuthorizationStatus, BookmarkButtonType} from '../const.ts';
+import {AppRoute, AuthorizationStatus, BookmarkButtonType} from '../const.ts';
 import {getBookmarkButtonStyle} from '../utils/bookmarkButtonUtils.ts';
 import {useAppSelector} from '../hooks/useAppSelector.ts';
 import {getAuthorizationStatus} from '../store/slices/user/userSelectors.ts';
@@ -15,17 +16,24 @@ interface BookmarkButtonProps {
 }
 
 export function BookmarkButton({ offerId, isFavorite, styleType }: BookmarkButtonProps) {
+  const navigate = useNavigate();
+
+  const dispatch = useAppDispatch();
   const authStatus = useAppSelector(getAuthorizationStatus);
   const currentOffer = useAppSelector(getOffer);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const dispatch = useAppDispatch();
 
   const { buttonClass, iconClass, width, height } = getBookmarkButtonStyle(styleType);
   const activeClass = isFavorite ? `${buttonClass}--active` : '';
 
   const handleClick = () => {
-    if (isSubmitting || authStatus !== AuthorizationStatus.Auth) {
+    if (isSubmitting) {
       return;
+    }
+
+    if (authStatus !== AuthorizationStatus.Auth){
+      navigate(AppRoute.Login);
     }
 
     setIsSubmitting(true);
@@ -57,7 +65,7 @@ export function BookmarkButton({ offerId, isFavorite, styleType }: BookmarkButto
       className={`${buttonClass} button ${activeClass}`}
       type="button"
       onClick={handleClick}
-      disabled={isSubmitting || authStatus !== AuthorizationStatus.Auth}
+      disabled={isSubmitting}
       aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
     >
       <svg className={iconClass} width={width} height={height}>

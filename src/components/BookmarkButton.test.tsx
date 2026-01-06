@@ -5,6 +5,10 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { NameSpace } from '../const';
 
+vi.mock('react-router-dom', () => ({
+  useNavigate: (route: string) => route
+}));
+
 vi.mock('../utils/bookmarkButtonUtils', () => ({
   getBookmarkButtonStyle: () => ({
     buttonClass: 'place-card__bookmark-button',
@@ -44,19 +48,6 @@ describe('Component: BookmarkButton', () => {
         offer: offerId ? { id: offerId } : null
       })
     }
-  });
-
-  it('is disabled when user is not authorized', () => {
-    const store = createMockStore(AuthorizationStatus.NotAuth);
-
-    render(
-      <Provider store={store}>
-        <BookmarkButton {...defaultProps} />
-      </Provider>
-    );
-
-    const button = screen.getByRole('button');
-    expect(button).toBeDisabled();
   });
 
   it('is enabled when user is authorized', () => {

@@ -6,11 +6,20 @@ import {toast} from 'react-toastify';
 import {DetailMessageType} from '../types/detailMessageType.ts';
 
 const StatusCodeMapping: Record<number, boolean> = {
-  [StatusCodes.BAD_REQUEST]: true,
+  [StatusCodes.UNAUTHORIZED]: true,
 };
 
 const shouldDisplayError = (response: AxiosResponse) =>
   Boolean(StatusCodeMapping[response.status]);
+
+const getMessageByError = (statusCode: StatusCodes, errorMessage: DetailMessageType) => {
+  switch (statusCode) {
+    case StatusCodes.UNAUTHORIZED:
+      return 'You need to be signed in, for this action.';
+    default:
+      throw new Error(`Unexpected error type. Status code: "${statusCode}", errorMessage: "${errorMessage.message}"`);
+  }
+};
 
 export const createAPI = (): AxiosInstance => {
   const api = axios.create({
@@ -34,9 +43,9 @@ export const createAPI = (): AxiosInstance => {
     (response) => response,
     (error: AxiosError<DetailMessageType>) => {
       if (error.response && shouldDisplayError(error.response)) {
-        const detailMessage = (error.response.data);
+        const detailMessage = getMessageByError(error.response.status, error.response.data);
 
-        toast.warn(detailMessage.message);
+        toast.warn(detailMessage);
       }
 
       throw error;
