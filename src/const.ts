@@ -1,4 +1,4 @@
-import {CityName} from './types/cityName.ts';
+import {CityName} from './types/city-name.ts';
 
 export const BACKEND_URL = 'https://14.design.htmlacademy.pro/six-cities';
 

@@ -1,9 +1,9 @@
 import { Mock, vi } from 'vitest';
 import { PayloadAction, MiddlewareAPI, Dispatch } from '@reduxjs/toolkit';
 import browserHistory from '../../browser-history';
-import { REDIRECT_ACTION_TYPE } from '../redirectAction';
+import { REDIRECT_ACTION_TYPE } from '../redirect-action.ts';
 import { redirect } from './redirect';
-import { rootReducer } from '../rootReducer';
+import { rootReducer } from '../root-reducer.ts';
 
 type Reducer = ReturnType<typeof rootReducer>;
 
