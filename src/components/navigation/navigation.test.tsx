@@ -14,7 +14,7 @@ vi.mock('./navigation-profile', () => ({
 }));
 
 vi.mock('./navigation-login', () => ({
-  NavigationLogIn: () => <li data-testid="navigation-login">Login</li>,
+  NavigationLogin: () => <li data-testid="navigation-login">Login</li>,
 }));
 
 describe('Component: Navigation', () => {
@@ -50,14 +50,14 @@ describe('Component: Navigation', () => {
     expect(screen.queryByTestId('navigation-login')).not.toBeInTheDocument();
   });
 
-  it('renders NavigationLogIn when user is not authorized', () => {
+  it('renders NavigationLogin when user is not authorized', () => {
     renderComponent(AuthorizationStatus.NotAuth);
 
     expect(screen.getByTestId('navigation-login')).toBeInTheDocument();
     expect(screen.queryByTestId('navigation-profile')).not.toBeInTheDocument();
   });
 
-  it('renders NavigationLogIn when authorization status is unknown', () => {
+  it('renders NavigationLogin when authorization status is unknown', () => {
     renderComponent(AuthorizationStatus.Unknown);
 
     expect(screen.getByTestId('navigation-login')).toBeInTheDocument();

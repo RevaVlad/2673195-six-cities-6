@@ -2,7 +2,7 @@ import {AppRoute, AuthorizationStatus} from '../../const.ts';
 import {useAppSelector} from '../../hooks/use-app-selector.ts';
 import {getAuthorizationStatus} from '../../store/slices/user/user-selectors.ts';
 import {NavigationProfile} from './navigation-profile.tsx';
-import {NavigationLogIn} from './navigation-logIn.tsx';
+import {NavigationLogin} from './navigation-login.tsx';
 import {Link} from 'react-router-dom';
 
 export function Navigation() {
@@ -19,7 +19,7 @@ export function Navigation() {
           </div>
           <nav className="header__nav">
             <ul className="header__nav-list">
-              {authStatus === AuthorizationStatus.Auth ? <NavigationProfile/> : <NavigationLogIn/>}
+              {authStatus === AuthorizationStatus.Auth ? <NavigationProfile/> : <NavigationLogin/>}
             </ul>
           </nav>
         </div>
